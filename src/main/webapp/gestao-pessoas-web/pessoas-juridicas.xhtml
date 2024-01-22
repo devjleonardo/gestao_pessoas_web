@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:composition template="template/template.xhtml">
+        <ui:define name="titulo">Formulário de Cadastro</ui:define>
+
+        <ui:define name="conteudo">
+            <div class="card crud-demo">
+                <h:form id="form">
+                    <p:growl id="messages" showDetail="true" />
+                    <p:toolbar>
+                        <p:toolbarGroup>
+                            <script type="text/javascript">
+                                function aplicarMascara() {
+                                    $("#dialogs\\:cnpj").mask("00.000.000/0000-00", { reverse: false });
+                                }
+                            </script>
+
+                            <p:commandButton
+                                value="Novo"
+                                icon="pi pi-plus"
+                                actionListener="#{pessoaJuridicaCrudBean.novaPessoaJuridica}"
+                                update=":dialogs:detalhes-pessoa-juridica-content"
+                                oncomplete="PF('cadastrarPessoaJuridicaDialog').show(); aplicarMascara();"
+                                styleClass="ui-button-success"
+                                style="margin-right: 0.5rem;">
+                                <p:resetInput target=":dialogs:detalhes-pessoa-juridica-content" />
+                            </p:commandButton>
+                        </p:toolbarGroup>
+
+                        <p:toolbarGroup align="right">
+                            <p:linkButton 
+                                value="Acessar a documentação da API" 
+                                onclick="window.open('http://localhost:8080/swagger-ui/index.html', '_blank');" 
+                                styleClass="ui-button-info" />
+                        </p:toolbarGroup>
+                    </p:toolbar>
+
+                    <p:dataTable
+                        id="dt-pessoas-juridicas"
+                        widgetVar="dtPessoasJuridicas"
+                        var="pessoaJuridica"
+                        value="#{pessoaJuridicaCrudBean.pessoasJuridicas}"
+                        reflow="true"
+                        styleClass="pessoas-juridicas-table"
+                        rowKey="#{pessoaJuridica.id}"
+                        paginator="true"
+                        rows="10"
+                        rowSelectMode="add"
+                        paginatorPosition="bottom">
+                        <f:facet name="header">
+                            <div class="pessoas-fisicas-table-header">
+                                <span style="font-weight: bold;">Pesquisar pessoa jurídica</span>
+                                <span class="filter-container ui-input-icon-left">
+                                    <i class="pi pi-search"></i>
+                                    <p:inputText id="globalFilter" onkeyup="PF('dtPessoasFisicas').filter()" placeholder="Pesquisar" />
+                                </span>
+                            </div>
+                        </f:facet>
+                        <p:column selectionMode="multiple" exportable="false"></p:column>
+
+                        <p:column headerText="Código" sortBy="#{pessoaJuridica.id}" filterBy="#{pessoaJuridica.id}">
+                            <h:outputText value="#{pessoaJuridica.id}" />
+                        </p:column>
+
+                        <p:column headerText="Razão socal" sortBy="#{pessoaJuridica.razaoSocial}" filterBy="#{pessoaJuridica.razaoSocial}">
+                            <h:outputText value="#{pessoaJuridica.razaoSocial}" />
+                        </p:column>
+
+                        <p:column headerText="CNPJ" sortBy="#{pessoaJuridica.cnpj}" filterBy="#{pessoaJuridica.cnpj}">
+                            <h:outputText value="#{pessoaJuridicaCrudBean.formatarCNPJ(pessoaJuridica.cnpj)}" />
+                        </p:column>
+
+                        <p:column headerText="Email" sortBy="#{pessoaJuridica.email}" filterBy="#{pessoaJuridica.email}">
+                            <h:outputText value="#{pessoaJuridica.email}" />
+                        </p:column>
+
+                        <p:column exportable="false">
+                            <p:commandButton
+                                icon="pi pi-pencil"
+                                update=":dialogs:detalhes-pessoa-juridica-content"
+                                oncomplete="PF('cadastrarPessoaJuridicaDialog').show(); aplicarMascara()"
+                                styleClass="edit-button rounded-button ui-button-success"
+                                process="@this">
+                                <f:setPropertyActionListener value="#{pessoaJuridica}" target="#{pessoaJuridicaCrudBean.pessoaJuridicaSelecionada}" />
+                                <p:resetInput target=":dialogs:detalhes-pessoa-juridica-content" />
+                            </p:commandButton>
+
+                            <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash" process="@this" oncomplete="PF('excluirPessoaJuridicaConfirmDialog').show()">
+                                <f:setPropertyActionListener value="#{pessoaJuridica}" target="#{pessoaJuridicaCrudBean.pessoaJuridicaSelecionada}" />
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+
+                <h:form id="dialogs">
+                    <p:dialog header="Detalhes do Pessoa Jurídica" showEffect="fade" modal="true" widgetVar="cadastrarPessoaJuridicaDialog" responsive="true" width="800">
+                        <p:outputPanel id="detalhes-pessoa-juridica-content" class="ui-fluid">
+                            <p:outputPanel rendered="#{not empty pessoaJuridicaCrudBean.pessoaJuridicaSelecionada}">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <div class="field">
+                                            <p:outputLabel for="razaoSocial">Razão social</p:outputLabel>
+                                            <p:inputText 
+                                                id="razaoSocial" 
+                                                value="#{pessoaJuridicaCrudBean.pessoaJuridicaSelecionada.razaoSocial}" 
+                                                requiredMessage="Por favor, preencha a razão social" 
+                                                required="true" 
+                                                styleClass="form-control" />
+                                            <p:message for="razaoSocial" styleClass="mt-2" style="margin-left: 0 !important;" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <div class="field">
+                                            <p:outputLabel for="cnpj">CNPJ</p:outputLabel>
+                                            <p:inputText
+                                                id="cnpj"
+                                                value="#{pessoaJuridicaCrudBean.pessoaJuridicaSelecionada.cnpj}"
+                                                placeholder="00.000.000/0000-00"
+                                                minlength="18" 
+                                                maxlength="18" 
+                                                required="true"
+                                                requiredMessage="Por favor, preencha o CNPJ"
+                                                styleClass="form-control">
+                                                <f:validateLength minimum="18" maximum="18"/>
+                                            </p:inputText>
+                                            <p:message for="cnpj" styleClass="mt-2" style="margin-left: 0 !important;" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-12">
+                                        <div class="field">
+                                            <p:outputLabel for="email">Email</p:outputLabel>
+                                            <p:inputText
+                                                id="email"
+                                                value="#{pessoaJuridicaCrudBean.pessoaJuridicaSelecionada.email}"
+                                                placeholder="Digite seu endereço de e-mail"
+                                                required="true"
+                                                requiredMessage="Por favor, preencha o e-mail"
+                                                validatorMessage="E-mail inválido"
+                                                styleClass="form-control">
+                                                <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                            </p:inputText>
+                                            <p:message for="email" styleClass="mt-2" style="margin-left: 0 !important;" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:outputPanel>
+                        </p:outputPanel>
+
+                        <f:facet name="footer">
+                            <p:commandButton 
+                                 value="Salvar" 
+                                 icon="pi pi-check" 
+                                 actionListener="#{pessoaJuridicaCrudBean.salvarOuAtualizar()}" 
+                                 update="detalhes-pessoa-juridica-content" 
+                                 process="detalhes-pessoa-juridica-content @this" />
+                            <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('cadastrarPessoaJuridicaDialog').hide()" class="ui-button-secondary" type="button" />
+                        </f:facet>
+                    </p:dialog>
+
+                    <p:confirmDialog 
+                        widgetVar="excluirPessoaJuridicaConfirmDialog" 
+                        showEffect="fade" 
+                        width="300" 
+                        message="Você tem certeza que deseja excluir esta pessoa jurídica?" 
+                        header="Confirmar" 
+                        severity="warn">
+                        <p:commandButton 
+                            value="Sim" 
+                            icon="pi pi-check" 
+                            actionListener="#{pessoaJuridicaCrudBean.excluir()}" 
+                            process="@this" 
+                            oncomplete="PF('excluirPessoaJuridicaConfirmDialog').hide()" />
+                        <p:commandButton value="Não" type="button" icon="pi pi-times" onclick="PF('excluirPessoaJuridicaConfirmDialog').hide()" styleClass="ui-button-secondary" />
+                    </p:confirmDialog>
+
+                    <p:button value="Voltar" outcome="index.xhtml" icon="pi pi-arrow-left" styleClass="ui-button-secondary" />
+                </h:form>
+            </div>
+        </ui:define>
+    </ui:composition>
+</html>
