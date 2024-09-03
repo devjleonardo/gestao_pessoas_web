@@ -1,9 +1,5 @@
 # Gestão de Pessoas Web
 
-Este projeto foi desenvolvido utilizando o framework Spring Boot com o propósito de realizar a gestão de pessoas. Por meio de uma API, que posteriormente foi integrada com JSF e o PrimeFaces, proporciona uma experiência de usuário dinâmica e interativa. A estrutura do projeto está organizada em diferentes pacotes, representando módulos específicos.
-
-# Gestão de Pessoas Web
-
 Esta aplicação web foi desenvolvida utilizando o framework Spring Boot, com o propósito de realizar a gestão de pessoas. Seguindo uma arquitetura modular, busca facilitar a manutenção e escalabilidade. A estrutura do projeto está organizada em diferentes pacotes, representando módulos específicos.
 
 ## Pré-requisitos
